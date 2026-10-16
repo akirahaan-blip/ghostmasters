@@ -98,6 +98,11 @@ button:disabled{opacity:.45;cursor:not-allowed}
 
 /* 写真 */
 .photo{max-width:100%;border-radius:8px;margin-top:8px;display:block}
+.result{margin-top:10px;padding:10px;border:2px solid var(--scope);border-radius:10px;background:#f6f0fb}
+.result img{max-width:100%;border-radius:6px;display:block;-webkit-touch-callout:default}
+.result .share{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:bold}
+.result .note{font-size:.8em;color:var(--sub);margin-top:6px}
+.result a{font-size:.85em;color:var(--sub)}
 .post-text{width:100%;min-height:90px;margin-top:8px;padding:8px;
   border:1px solid var(--line);border-radius:6px;font-size:.9em;font-family:inherit}
 .hint{font-size:.8em;color:var(--sub);margin-top:20px;border-top:1px solid var(--line);padding-top:12px}
@@ -435,13 +440,32 @@ function buildSlot(dayData, slotIndex){
   postRow.className = "row";
   postRow.append(imgBtn, txtBtn);
 
+  // 作った投稿用画像（iPhoneでは共有メニューの「画像を保存」で写真アプリに入る）
+  const resultBox = document.createElement("div");
+  resultBox.className = "result";
+  resultBox.hidden = true;
+  const resultImg = document.createElement("img");
+  resultImg.alt = "投稿用画像";
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "share";
+  shareBtn.textContent = "📤 保存・共有する";
+  const dlLink = document.createElement("a");
+  dlLink.textContent = "ファイルとしてダウンロード";
+  const resultRow = document.createElement("div");
+  resultRow.className = "row";
+  resultRow.append(shareBtn, dlLink);
+  const resultNote = document.createElement("div");
+  resultNote.className = "note";
+  resultBox.append(resultImg, resultRow, resultNote);
+
   wrap.append(head, labelInput, monsEl, addRow, scopeBox, detailEl,
-              fileInput, photoEl, postRow, postText);
+              fileInput, photoEl, postRow, postText, resultBox);
 
   const view = {
     slot, day: dayData.day, index: slotIndex,
     scoreEl, detailEl, scopeInput, scopeNote, addBtn, countEl, monsEl,
-    photoEl, imgBtn, postText
+    photoEl, imgBtn, postText,
+    resultBox, resultImg, shareBtn, dlLink, resultNote
   };
   views.push(view);
 
@@ -467,11 +491,13 @@ function buildSlot(dayData, slotIndex){
       photoEl.src = r.result;
       photoEl.hidden = false;
       imgBtn.disabled = false;
+      clearResult(view);
     };
     r.readAsDataURL(f);
   };
 
   imgBtn.onclick = ()=> makeImage(view);
+  shareBtn.onclick = ()=> shareImage(view);
   txtBtn.onclick = ()=> copyPostText(view);
 
   return wrap;
@@ -537,6 +563,9 @@ function refresh(){
     const { total, items, karakara } = calcSlot(v.slot);
     v.total = total;
     v.items = items;
+
+    // 作った後にスコアが変わったら、古い画像は消して作り直してもらう
+    if(v.result && v.result.total !== total) clearResult(v);
 
     // スコア
     v.scoreEl.textContent = total + "点";
@@ -652,15 +681,49 @@ function makeImage(view){
     ctx.fillText(view.total + "点", w * 0.96, h + barH * 0.5);
 
     c.toBlob(blob=>{
+      if(!blob) return;
+      clearResult(view);
+      const name = "ghostmasters_day" + view.day + "_" + (view.index + 1) + ".png";
+      const file = new File([blob], name, { type:"image/png" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "ghostmasters_day" + view.day + "_" + (view.index + 1) + ".png";
-      a.click();
-      URL.revokeObjectURL(url);
+      view.result = { file, url, total: view.total };
+
+      view.resultImg.src = url;
+      view.dlLink.href = url;
+      view.dlLink.download = name;
+
+      // 共有メニューにファイルを渡せる端末（iPhoneなど）は共有ボタンを出す。
+      // ダウンロードだと iPhone では「ファイル」アプリに入ってしまうため。
+      const canShare = !!(navigator.canShare && navigator.canShare({ files:[file] }));
+      view.shareBtn.hidden = !canShare;
+      view.resultNote.textContent = canShare
+        ? "「保存・共有する」→「画像を保存」で写真アプリに保存できます。画像の長押しでも保存できます。"
+        : "画像を長押し（パソコンは右クリック）して保存してください。";
+
+      view.resultBox.hidden = false;
+      view.resultBox.scrollIntoView({ behavior:"smooth", block:"nearest" });
     }, "image/png");
   };
   img.src = src;
+}
+
+/* 共有メニューを開く。画像の生成とは別のタップで呼ぶ
+   （Safariはタップ直後でないと共有メニューを開かせてくれないため） */
+function shareImage(view){
+  if(!view.result) return;
+  navigator.share({ files:[view.result.file] }).catch(e=>{
+    if(e && e.name === "AbortError") return;   // 共有メニューを閉じただけ
+    alert("共有できませんでした。画像を長押しして保存してください。");
+  });
+}
+
+function clearResult(view){
+  if(view.result){
+    URL.revokeObjectURL(view.result.url);
+    view.result = null;
+  }
+  view.resultBox.hidden = true;
+  view.resultImg.removeAttribute("src");
 }
 
 /* ============================================================
