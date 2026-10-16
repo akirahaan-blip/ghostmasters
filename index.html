@@ -106,6 +106,17 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .post-text{width:100%;min-height:90px;margin-top:8px;padding:8px;
   border:1px solid var(--line);border-radius:6px;font-size:.9em;font-family:inherit}
 .hint{font-size:.8em;color:var(--sub);margin-top:20px;border-top:1px solid var(--line);padding-top:12px}
+
+/* X などのアプリ内ブラウザで開いたときの案内 */
+.inapp{margin:10px 0 0;padding:10px 12px;border:2px solid #e0a800;border-radius:10px;background:#fff8e1;font-size:.9em}
+.inapp b{display:block;margin-bottom:4px}
+.inapp .open{display:inline-block;margin:8px 0 4px;padding:8px 14px;border-radius:6px;
+  background:var(--accent);color:#fff;text-decoration:none;font-weight:bold}
+.inapp .small{font-size:.85em;color:var(--sub)}
+
+/* コピーした画像の貼り付け */
+.paste-zone{margin-top:6px;padding:10px;border:2px dashed var(--scope);border-radius:8px;
+  text-align:center;font-size:.85em;color:var(--scope);background:#faf6fd}
 </style>
 </head>
 <body>
@@ -119,6 +130,14 @@ button:disabled{opacity:.45;cursor:not-allowed}
   </div>
   <img class="r" src="mismagius.png" alt="ムウマージ">
 </header>
+
+<div class="inapp" id="inapp" hidden>
+  <b>📱 X（ツイッター）などのアプリの中で開いています</b>
+  この画面では写真ライブラリから写真を選べません。また、記録がSafariとは別の場所に保存され、消えてしまうことがあります。<br>
+  <a class="open" id="openSafari" href="#">Safariで開く</a><br>
+  <span class="small">開かないときは、画面の「…」や共有ボタンから「ブラウザで開く」「Safariで開く」を選んでください。
+  このまま使う場合は、写真アプリで画像をコピーしてから各リサーチの「📋 コピーした画像を貼り付け」を押してください。</span>
+</div>
 
 <div class="best">
   <img src="misdreavus.png" alt="">
@@ -269,6 +288,30 @@ function save(){
 
 const state = loadState();
 const photos = {};      // 写真は保存しない（この変数の中だけに持つ）
+const PASTE_MSG = "ここを長押しして「ペースト」を選んでください";
+const NO_IMAGE_MSG = "コピーされた画像が見つかりません。写真アプリで画像を開き、共有ボタン →「コピー」を押してから試してください。";
+
+/* 選んだ写真・貼り付けた画像を読み込む（保存はしない） */
+function loadPhoto(view, blob){
+  const r = new FileReader();
+  r.onload = ()=>{
+    photos[view.day + "-" + view.index] = r.result;
+    view.photoEl.src = r.result;
+    view.photoEl.hidden = false;
+    view.imgBtn.disabled = false;
+    clearResult(view);
+  };
+  r.readAsDataURL(blob);
+}
+
+/* X・LINE・Instagram などのアプリ内ブラウザか
+   iPhoneのアプリ内ブラウザはUAに "Safari/" が付かない（SafariやiPhone版Chromeには付く） */
+function isInAppBrowser(){
+  const ua = navigator.userAgent;
+  if(/Twitter|Line\/|Instagram|FBAN|FBAV/i.test(ua)) return true;
+  const ios = /iPhone|iPad|iPod/.test(ua);
+  return ios && !/Safari\//.test(ua);
+}
 const views  = [];      // 各リサーチ枠のDOM参照
 
 /* ============================================================
@@ -425,6 +468,17 @@ function buildSlot(dayData, slotIndex){
   const fileInput = document.createElement("input");
   fileInput.type = "file";
   fileInput.accept = "image/*";
+  // X などのアプリ内ブラウザでは写真ライブラリを選べないので、コピーした画像の貼り付けも用意する
+  const pasteBtn = document.createElement("button");
+  pasteBtn.textContent = "📋 コピーした画像を貼り付け";
+  const photoRow = document.createElement("div");
+  photoRow.className = "row";
+  photoRow.append(fileInput, pasteBtn);
+  const pasteZone = document.createElement("div");
+  pasteZone.className = "paste-zone";
+  pasteZone.contentEditable = "true";
+  pasteZone.hidden = true;
+  pasteZone.textContent = PASTE_MSG;
   const photoEl = document.createElement("img");
   photoEl.className = "photo";
   photoEl.hidden = true;
@@ -459,7 +513,7 @@ function buildSlot(dayData, slotIndex){
   resultBox.append(resultImg, resultRow, resultNote);
 
   wrap.append(head, labelInput, monsEl, addRow, scopeBox, detailEl,
-              fileInput, photoEl, postRow, postText, resultBox);
+              photoRow, pasteZone, photoEl, postRow, postText, resultBox);
 
   const view = {
     slot, day: dayData.day, index: slotIndex,
@@ -484,17 +538,39 @@ function buildSlot(dayData, slotIndex){
 
   fileInput.onchange = ()=>{
     const f = fileInput.files[0];
-    if(!f) return;
-    const r = new FileReader();
-    r.onload = ()=>{
-      photos[view.day + "-" + view.index] = r.result;
-      photoEl.src = r.result;
-      photoEl.hidden = false;
-      imgBtn.disabled = false;
-      clearResult(view);
-    };
-    r.readAsDataURL(f);
+    if(f) loadPhoto(view, f);
   };
+
+  // まずクリップボードを直接読む。読めない環境では貼り付け欄を出して「ペースト」してもらう
+  pasteBtn.onclick = async ()=>{
+    if(navigator.clipboard && navigator.clipboard.read){
+      try{
+        const items = await navigator.clipboard.read();
+        for(const it of items){
+          const type = it.types.find(t => t.startsWith("image/"));
+          if(type){ loadPhoto(view, await it.getType(type)); return; }
+        }
+        alert(NO_IMAGE_MSG);
+        return;
+      }catch(e){ /* 下の貼り付け欄に切り替える */ }
+    }
+    pasteZone.hidden = false;
+    pasteZone.focus();
+  };
+  pasteZone.addEventListener("paste", e=>{
+    e.preventDefault();
+    const files = e.clipboardData ? [...e.clipboardData.files] : [];
+    const f = files.find(x => x.type.startsWith("image/"));
+    if(f){
+      loadPhoto(view, f);
+      pasteZone.hidden = true;
+      pasteZone.blur();
+    }else{
+      alert(NO_IMAGE_MSG);
+    }
+  });
+  // 貼り付け欄に文字を打ち込めないようにする
+  pasteZone.addEventListener("beforeinput", e=>{ e.preventDefault(); });
 
   imgBtn.onclick = ()=> makeImage(view);
   shareBtn.onclick = ()=> shareImage(view);
@@ -743,6 +819,18 @@ function scrollToOpenDay(){
 
 // ブラウザによる読み込み時の位置復元を止める（上の移動が打ち消されないように）
 if("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+// アプリ内ブラウザなら Safari で開き直す案内を出す
+// （x-safari-https:// はiPhoneでSafariを直接開くURL。アプリによっては開かない）
+if(isInAppBrowser()){
+  document.getElementById("inapp").hidden = false;
+  const btn = document.getElementById("openSafari");
+  if(/iPhone|iPad|iPod/.test(navigator.userAgent)){
+    btn.href = "x-safari-" + location.href;
+  }else{
+    btn.style.display = "none";   // Android には Safari がないので、メニューから開いてもらう
+  }
+}
 
 buildAll();
 refresh();
