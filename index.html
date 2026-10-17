@@ -399,9 +399,11 @@ function calcSlot(slot){
   });
 
   // 2. 種族ボーナス（色違いでも倍にしない）
+  //    そろったセットの数だけ加算する。セット数は、いちばん数の少ない形態の体数
+  //    例：ムウマ×2＋ムウマージ×2 → 2セット、ムウマ×2＋ムウマージ×1 → 1セット
   FAMILIES.forEach(f => {
-    const complete = f.members.every(n => slot.mons.some(m => m.name === n));
-    if(complete){
+    const sets = Math.min(...f.members.map(n => slot.mons.filter(m => m.name === n).length));
+    for(let i = 0; i < sets; i++){
       items.push({ text:"種族ボーナス(" + f.members.join("+") + ")", value:f.bonus });
     }
   });
