@@ -9,7 +9,7 @@
 <!-- 題字と投稿用画像に M PLUS 1p を使う（使う文字の分だけ自動で読み込まれる） -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@500;700;800&display=swap">
 <style>
 :root{
   --line:#dcdcdc;
@@ -183,6 +183,42 @@ button:disabled{opacity:.45;cursor:not-allowed}
 /* コピーした画像の貼り付け */
 .paste-zone{margin-top:6px;padding:10px;border:2px dashed var(--scope);border-radius:8px;
   text-align:center;font-size:.85em;color:var(--scope);background:#faf6fd}
+
+/* 色違いおめでとう（色違いをオンにしたときに数秒だけ出る） */
+/* ゲンガーの絵の下に、ゲームのセリフ枠のような黒い枠を出す */
+.congrats{
+  position:fixed;left:50%;bottom:20px;z-index:30;
+  width:min(360px,calc(100% - 24px));translate:-50% 0;
+  cursor:pointer;
+  animation:pop .45s cubic-bezier(.2,1.6,.4,1) both;
+}
+.congrats.out{animation:fadeout .4s ease forwards}
+.congrats .pic{position:relative;width:160px;margin:0 auto -14px}
+.congrats img{display:block;width:100%;filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))}
+.congrats .sp{position:absolute;color:#ffc93c;font-size:1.4em;text-shadow:0 0 4px #fff;
+  animation:sparkle 1.2s ease-in-out infinite}
+.congrats .sp.a{left:-14px;top:30px}
+.congrats .sp.b{right:-10px;top:4px;animation-delay:-.4s}
+.congrats .sp.c{right:-18px;top:70px;font-size:1em;animation-delay:-.8s}
+.talk{
+  position:relative;
+  padding:14px 18px 16px 22px;border-radius:10px;
+  background:rgba(22,22,30,.93);border:1.5px solid rgba(255,255,255,.18);
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+  color:#fff;font-family:"M PLUS 1p",sans-serif;font-weight:500;
+  font-size:min(16px,4.3vw);line-height:1.8;letter-spacing:.04em;
+  text-align:left;white-space:nowrap;
+}
+/* 左上・左下の黄色いかぎ */
+.talk::before,.talk::after{content:"";position:absolute;left:-2px;width:12px;height:12px;border:0 solid #f5c400}
+.talk::before{top:-2px;border-top-width:3px;border-left-width:3px;border-top-left-radius:10px}
+.talk::after{bottom:-2px;border-bottom-width:3px;border-left-width:3px;border-bottom-left-radius:10px}
+.talk .next{position:absolute;right:12px;bottom:6px;font-size:.7em;animation:blink 1s steps(1) infinite}
+@keyframes pop{from{opacity:0;transform:scale(.6) translateY(20px)}to{opacity:1;transform:none}}
+@keyframes fadeout{to{opacity:0;transform:translateY(12px)}}
+@keyframes sparkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.congrats,.congrats .sp,.talk .next{animation:none}}
 </style>
 </head>
 <body>
@@ -215,6 +251,15 @@ button:disabled{opacity:.45;cursor:not-allowed}
 </div>
 
 <div id="days"></div>
+
+<!-- 色違いおめでとう。絵は gengar.png（なければ文字だけ出る） -->
+<div class="congrats" id="congrats" hidden>
+  <div class="pic">
+    <img id="congratsImg" src="gengar.png" alt="" onerror="this.remove()">
+    <span class="sp a">★</span><span class="sp b">✦</span><span class="sp c">★</span>
+  </div>
+  <div class="talk"><span id="congratsText"></span><span class="next">▼</span></div>
+</div>
 
 <p class="hint">
 シルフスコープを使うと、👻 が付いたポケモンのうち一番点の高い1体が2倍になります。<br>
@@ -485,6 +530,49 @@ function buildPalette(slot, view){
   return pal;
 }
 
+/* 色違いのお祝い。ゲームのように1文字ずつ出して、約4秒で閉じる。タップでもすぐ閉じる */
+const CONGRATS_TEXT = "おめでとう！ゲンガーは　いろちがいを\nおいわい　している！";
+let congratsTimer = null;
+let typeTimer = null;
+function celebrate(){
+  const box = document.getElementById("congrats");
+  const textEl = document.getElementById("congratsText");
+  // 続けて押されたときも、最初から出し直す
+  clearTimeout(congratsTimer);
+  clearInterval(typeTimer);
+  box.classList.remove("out");
+  box.hidden = true;
+  void box.offsetWidth;   // アニメーションをやり直させるためのおまじない
+  box.hidden = false;
+
+  // 1文字ずつ表示（「動きを減らす」設定の端末では一度に全部出す）
+  const show = n => {
+    textEl.innerHTML = "";
+    CONGRATS_TEXT.slice(0, n).split("\n").forEach((line, i)=>{
+      if(i) textEl.appendChild(document.createElement("br"));
+      textEl.append(line);
+    });
+  };
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){
+    show(CONGRATS_TEXT.length);
+  }else{
+    let n = 0;
+    show(0);
+    typeTimer = setInterval(()=>{
+      show(++n);
+      if(n >= CONGRATS_TEXT.length) clearInterval(typeTimer);
+    }, 45);
+  }
+
+  const close = ()=>{
+    clearInterval(typeTimer);
+    box.classList.add("out");
+    congratsTimer = setTimeout(()=>{ box.hidden = true; box.classList.remove("out"); }, 400);
+  };
+  box.onclick = ()=>{ clearTimeout(congratsTimer); close(); };
+  congratsTimer = setTimeout(close, 4000);
+}
+
 /* 追加したポケモン1体分の行（名前・色違いボタン・削除） */
 function buildMonRow(slot, mon, view){
   const row = document.createElement("div");
@@ -501,6 +589,7 @@ function buildMonRow(slot, mon, view){
   shiny.onclick = ()=>{
     mon.shiny = !mon.shiny;
     shiny.classList.toggle("on", mon.shiny);
+    if(mon.shiny) celebrate();   // オンにしたときだけお祝いする
     refresh();
   };
 
