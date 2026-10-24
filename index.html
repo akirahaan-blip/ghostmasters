@@ -183,6 +183,7 @@ details.guide[open]>summary::before{content:"▼"}
 .guide-body{padding:0 14px 12px;font-size:.92em;background:#fff;border-radius:0 0 10px 10px}
 .guide-body h3{font-size:1em;color:var(--accent);margin:0;padding:14px 0 4px;border-top:1px solid var(--line)}
 .guide-body h3:first-child{border-top:none}
+.guide-body .toggle-tip{margin:0;padding:10px 0 4px;color:var(--sub);font-size:.95em}
 .guide-body ol,.guide-body ul{margin:4px 0;padding-left:1.4em}
 .guide-body li{margin:3px 0}
 .guide-body p{margin:6px 0}
@@ -192,8 +193,12 @@ details.guide[open]>summary::before{content:"▼"}
 /* X などのアプリ内ブラウザで開いたときの案内 */
 .inapp{margin:10px 0 0;padding:10px 12px;border:2px solid #e0a800;border-radius:10px;background:#fff8e1;font-size:.9em}
 .inapp b{display:block;margin-bottom:4px}
-.inapp .open{display:inline-block;margin:8px 0 4px;padding:8px 14px;border-radius:6px;
-  background:var(--accent);color:#fff;text-decoration:none;font-weight:bold}
+.inapp .open{display:block;margin:8px 0 6px;padding:9px 14px;border:none;border-radius:6px;
+  background:var(--accent);color:#fff;font-weight:bold;font-size:1em}
+.inapp .how{margin-top:8px}
+.inapp .in{display:inline;margin:0}
+.inapp .steps{margin:2px 0;padding-left:1.4em}
+.inapp .url{width:100%;margin:0 0 6px;padding:6px;border:1px solid var(--line);border-radius:6px;font-size:.9em}
 .inapp .small{font-size:.85em;color:var(--sub)}
 
 /* コピーした画像の貼り付け */
@@ -265,10 +270,18 @@ details.guide[open]>summary::before{content:"▼"}
 
 <div class="inapp" id="inapp" hidden>
   <b>📱 X（ツイッター）などのアプリの中で開いています</b>
-  この画面では写真ライブラリから写真を選べません。また、記録がSafariとは別の場所に保存され、消えてしまうことがあります。<br>
-  <a class="open" id="openSafari" href="#">Safariで開く</a><br>
-  <span class="small">開かないときは、画面の「…」や共有ボタンから「ブラウザで開く」「Safariで開く」を選んでください。
-  このまま使う場合は、写真アプリで画像をコピーしてから各リサーチの「📋 コピーした画像を貼り付け」を押してください。</span>
+  この画面で入れた記録は、<span class="browser">Safari や Chrome</span> とは別の場所に保存されるため、あとで見られなくなったり消えてしまったりすることがあります。<br>
+  <b><span class="browser">Safari や Chrome</span> で開き直して、ホーム画面に追加して使うのが安全です。</b>
+  <b class="how">開き直す方法</b>
+  <ol class="steps">
+    <li>下のボタンで、このページのURLをコピーする</li>
+    <li><span class="browser">Safari や Chrome</span> を開く</li>
+    <li>上のアドレス欄を押して「<b class="in">ペースト</b>」→ 開く</li>
+    <li>開いたら「📖 使い方・ホーム画面に追加」の手順で、ホーム画面に追加する</li>
+  </ol>
+  <button class="open" id="copyUrl" type="button">🔗 このページのURLをコピー</button>
+  <input class="url" id="pageUrl" readonly hidden>
+  <span class="small">X の画面の「…」や共有ボタンに「ブラウザで開く」などがあれば、そちらからでも開けます。</span>
 </div>
 
 <div class="best">
@@ -283,6 +296,8 @@ details.guide[open]>summary::before{content:"▼"}
 <details class="guide">
   <summary>📖 使い方・ホーム画面に追加</summary>
   <div class="guide-body">
+
+    <p class="toggle-tip">この説明は、左の <b>▼</b> を押すと閉じることができます。<b>▶</b> を押すと、もう一度開けます。<br>DAY1〜DAY7 も同じように開いたり閉じたりできます。</p>
 
     <h3>📝 記録のしかた</h3>
     <ol>
@@ -306,10 +321,16 @@ details.guide[open]>summary::before{content:"▼"}
     <h3>📱 ホーム画面に追加（アプリのように使う）</h3>
     <p><b>iPhone（Safari）</b></p>
     <ol>
-      <li>Safari でこのページを開く（X の中で開いている場合は、先に Safari で開き直す）</li>
+      <li>Safari でこのページを開く（X の中で開いている場合は、先に開き直す）</li>
       <li>画面下の <b>共有ボタン</b>（四角から上向きの矢印）を押す</li>
       <li>メニューを下へ動かして「<b>ホーム画面に追加</b>」を押す</li>
       <li>右上の「<b>追加</b>」を押す → ホーム画面にムウマのアイコンが出ます</li>
+    </ol>
+    <p><b>iPhone（Chrome）</b></p>
+    <ol>
+      <li>Chrome でこのページを開く</li>
+      <li>アドレス欄の右の <b>共有ボタン</b>（四角から上向きの矢印）を押す</li>
+      <li>「<b>ホーム画面に追加</b>」→「<b>追加</b>」</li>
     </ol>
     <p><b>Android（Chrome）</b></p>
     <ol>
@@ -317,13 +338,13 @@ details.guide[open]>summary::before{content:"▼"}
       <li>右上の「<b>︙</b>」を押す</li>
       <li>「<b>ホーム画面に追加</b>」を押して「<b>追加</b>」</li>
     </ol>
-    <p class="caution">⚠ iPhone では、ホーム画面のアイコンから開くと、<b>Safari で入れた記録が出ないことがあります</b>（記録の保存場所が別になるため）。ホーム画面に追加したら、そのあとは<b>アイコンから使う</b>のがおすすめです。追加するときに「Webアプリとして開く」が出たらオフにすると、Safari と同じ記録を使えます。</p>
+    <p class="caution">⚠ iPhone では、ホーム画面のアイコンから開くと、<b>Safari や Chrome で入れた記録が出ないことがあります</b>（記録の保存場所が別になるため）。ホーム画面に追加したら、そのあとは<b>アイコンから使う</b>のがおすすめです。追加するときに「Webアプリとして開く」が出たらオフにすると、ブラウザと同じ記録を使えます。</p>
 
     <h3>⚠ 注意</h3>
     <ul>
       <li>記録は<b>この端末のこのブラウザの中だけ</b>に保存されます。他の端末やブラウザでは見られません</li>
       <li>ブラウザの「履歴とWebサイトデータを消去」をすると、記録も消えます</li>
-      <li>X などのアプリの中で開くと、記録が消えることがあります。Safari（Android は Chrome）で使ってください</li>
+      <li>X などのアプリの中で開くと、記録が消えることがあります。Safari や Chrome で開いて、ホーム画面に追加して使ってください</li>
       <li>写真は保存されません。ページを開き直したら、もう一度選んでください</li>
     </ul>
   </div>
@@ -1197,16 +1218,33 @@ function scrollToOpenDay(){
 // ブラウザによる読み込み時の位置復元を止める（上の移動が打ち消されないように）
 if("scrollRestoration" in history) history.scrollRestoration = "manual";
 
-// アプリ内ブラウザなら Safari で開き直す案内を出す
-// （x-safari-https:// はiPhoneでSafariを直接開くURL。アプリによっては開かない）
+// アプリ内ブラウザなら Safari（Android は Chrome）で開き直す案内を出す。
+// 以前は x-safari-https:// で Safari を直接開くボタンにしていたが、X の中では反応しなかったので、
+// URLをコピーしてもらう方式にしている
 if(isInAppBrowser()){
   document.getElementById("inapp").hidden = false;
-  const btn = document.getElementById("openSafari");
-  if(/iPhone|iPad|iPod/.test(navigator.userAgent)){
-    btn.href = "x-safari-" + location.href;
-  }else{
-    btn.style.display = "none";   // Android には Safari がないので、メニューから開いてもらう
+  if(!/iPhone|iPad|iPod/.test(navigator.userAgent)){
+    document.querySelectorAll("#inapp .browser").forEach(el => { el.textContent = "Chrome"; });
   }
+  const pageUrl = location.origin + location.pathname;
+  const urlBox = document.getElementById("pageUrl");
+  urlBox.value = pageUrl;
+  const copyBtn = document.getElementById("copyUrl");
+  copyBtn.onclick = ()=>{
+    const done = ()=>{ copyBtn.textContent = "✅ コピーしました"; };
+    // コピーできないときは、URLの欄を出して長押しでコピーしてもらう
+    const fallback = ()=>{
+      urlBox.hidden = false;
+      urlBox.focus();
+      urlBox.select();
+      copyBtn.textContent = "下の欄を長押しして「コピー」してください";
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(pageUrl).then(done, fallback);
+    }else{
+      fallback();
+    }
+  };
 }
 
 buildAll();
