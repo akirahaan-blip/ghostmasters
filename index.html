@@ -218,7 +218,20 @@ button:disabled{opacity:.45;cursor:not-allowed}
 @keyframes fadeout{to{opacity:0;transform:translateY(12px)}}
 @keyframes sparkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
 @keyframes blink{50%{opacity:0}}
-@media (prefers-reduced-motion:reduce){.congrats,.congrats .sp,.talk .next{animation:none}}
+
+/* カラカラが出たとき：画面いっぱいにカラカラの絵を出して、3枚を順番に切り替える */
+.karakara-show{
+  position:fixed;inset:0;z-index:40;
+  display:flex;align-items:center;justify-content:center;padding:12px;
+  background:rgba(0,0,0,.7);cursor:pointer;
+  animation:kkIn .25s ease-out both;
+}
+.karakara-show[hidden]{display:none}
+.karakara-show.out{animation:fadeout .3s ease forwards}
+.karakara-show img{width:100%;max-width:720px;border-radius:12px;
+  box-shadow:0 8px 30px rgba(0,0,0,.5)}
+@keyframes kkIn{from{opacity:0;transform:scale(1.15)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.congrats,.congrats .sp,.talk .next,.karakara-show{animation:none}}
 </style>
 </head>
 <body>
@@ -259,6 +272,11 @@ button:disabled{opacity:.45;cursor:not-allowed}
     <span class="sp a">★</span><span class="sp b">✦</span><span class="sp c">★</span>
   </div>
   <div class="talk"><span id="congratsText"></span><span class="next">▼</span></div>
+</div>
+
+<!-- カラカラが出たときの絵（karakara1〜3.jpg を順番に切り替える） -->
+<div class="karakara-show" id="karakaraShow" hidden>
+  <img id="karakaraImg" src="karakara1.jpg" alt="カラカラ 0点">
 </div>
 
 <p class="hint">
@@ -515,6 +533,7 @@ function buildPalette(slot, view){
         slot.mons.push(mon);
         buildMonRow(slot, mon, view);
         refresh();
+        if(n === KARAKARA) karakaraShock();   // カラカラはスコア0になるので大きく知らせる
       };
       grid.appendChild(b);
       view.palButtons.push(b);
@@ -571,6 +590,45 @@ function celebrate(){
   };
   box.onclick = ()=>{ clearTimeout(congratsTimer); close(); };
   congratsTimer = setTimeout(close, 4000);
+}
+
+/* カラカラが出たときの絵。3枚を0.8秒ずつ順番に切り替えて、2周（4.8秒）で閉じる。
+   最後は泣いている3枚目で終わる。タップでもすぐ閉じる */
+const KARAKARA_STEP = 800;   // 1枚を見せる時間（ミリ秒）
+const KARAKARA_FRAMES = ["karakara1.jpg", "karakara2.jpg", "karakara3.jpg"];
+// 切り替えのたびに読み込み待ちでちらつかないよう、先に読み込んでおく
+KARAKARA_FRAMES.forEach(src => { new Image().src = src; });
+let karakaraTimer = null;
+let karakaraFrameTimer = null;
+function karakaraShock(){
+  const box = document.getElementById("karakaraShow");
+  const img = document.getElementById("karakaraImg");
+  clearTimeout(karakaraTimer);
+  clearInterval(karakaraFrameTimer);
+  box.classList.remove("out");
+  box.hidden = true;
+  void box.offsetWidth;   // アニメーションをやり直させるためのおまじない
+  box.hidden = false;
+
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){
+    img.src = KARAKARA_FRAMES[2];   // 「動きを減らす」設定では泣いている1枚だけ
+  }else{
+    let i = 0;
+    img.src = KARAKARA_FRAMES[0];
+    karakaraFrameTimer = setInterval(()=>{
+      i = (i + 1) % KARAKARA_FRAMES.length;
+      img.src = KARAKARA_FRAMES[i];
+    }, KARAKARA_STEP);
+  }
+
+  const close = ()=>{
+    clearInterval(karakaraFrameTimer);
+    box.classList.add("out");
+    karakaraTimer = setTimeout(()=>{ box.hidden = true; box.classList.remove("out"); }, 300);
+  };
+  box.onclick = ()=>{ clearTimeout(karakaraTimer); close(); };
+  // 1枚目に戻る直前に閉じる（ぴったりだと、消える途中で1枚目が見えてしまう）
+  karakaraTimer = setTimeout(close, KARAKARA_STEP * KARAKARA_FRAMES.length * 2 - 100);
 }
 
 /* 追加したポケモン1体分の行（名前・色違いボタン・削除） */
