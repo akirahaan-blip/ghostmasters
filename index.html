@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ゴーストマスターズ スコア記録</title>
 <link rel="icon" href="misdreavus.png">
-<link rel="apple-touch-icon" href="misdreavus.png">
+<!-- ホーム画面のアイコン（透明だと iPhone で黒く塗られるので、夜空の背景を付けた icon.png） -->
+<link rel="apple-touch-icon" href="icon.png">
+<!-- ホーム画面に追加したときのアイコンの下の名前（長いと途中で切れるので短く） -->
+<meta name="apple-mobile-web-app-title" content="ゴーストマスターズ">
 <!-- 題字と投稿用画像に M PLUS 1p を使う（使う文字の分だけ自動で読み込まれる） -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -171,6 +174,19 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .result a{font-size:.85em;color:var(--sub)}
 .post-text{width:100%;min-height:90px;margin-top:8px;padding:8px;
   border:1px solid var(--line);border-radius:6px;font-size:.9em;font-family:inherit}
+/* 使い方（タップで開く） */
+details.guide{border:1px solid var(--line);border-radius:10px;margin:0 0 12px;background:#f6f0fb}
+details.guide>summary{padding:10px 12px;font-weight:bold;color:var(--accent);cursor:pointer;list-style:none}
+details.guide>summary::-webkit-details-marker{display:none}
+details.guide>summary::before{content:"▶";font-size:.8em;margin-right:6px;color:var(--sub)}
+details.guide[open]>summary::before{content:"▼"}
+.guide-body{padding:0 14px 12px;font-size:.92em;background:#fff;border-radius:0 0 10px 10px}
+.guide-body h3{font-size:1em;color:var(--accent);margin:0;padding:14px 0 4px;border-top:1px solid var(--line)}
+.guide-body h3:first-child{border-top:none}
+.guide-body ol,.guide-body ul{margin:4px 0;padding-left:1.4em}
+.guide-body li{margin:3px 0}
+.guide-body p{margin:6px 0}
+.guide-body .caution{padding:8px 10px;border-radius:8px;background:#fff8e1;border:1px solid #e0a800;font-size:.95em}
 .hint{font-size:.8em;color:var(--sub);margin-top:20px;border-top:1px solid var(--line);padding-top:12px}
 
 /* X などのアプリ内ブラウザで開いたときの案内 */
@@ -262,6 +278,56 @@ button:disabled{opacity:.45;cursor:not-allowed}
     <div class="val" id="bestVal">まだ記録がありません</div>
   </div>
 </div>
+
+<!-- 使い方（ふだんは閉じておき、タップで開く） -->
+<details class="guide">
+  <summary>📖 使い方・ホーム画面に追加</summary>
+  <div class="guide-body">
+
+    <h3>📝 記録のしかた</h3>
+    <ol>
+      <li>その日の <b>DAY</b> をタップして開く（前回の続きの日は最初から開いています）</li>
+      <li>リサーチの「<b>＋ポケモンを追加</b>」を押す → ポケモンのボタンが並びます</li>
+      <li>出たポケモンのボタンを押す。<b>2体なら2回</b>押します（緑＝加点、赤＝減点）</li>
+      <li>色違いがいたら、その行の「<b>★色違い</b>」を押す（点数が2倍）</li>
+      <li>シルフスコープを使ったら「<b>🔍 シルフスコープを使う</b>」にチェック。イベント中<b>1回だけ</b>です</li>
+    </ol>
+    <p>点数と内訳は自動で計算されます。いちばん高い点数は、画面上の「★ ベストスコア」にいつも出ています。まちがえたポケモンは「✕」で消せます。</p>
+
+    <h3>📤 X に投稿するとき</h3>
+    <ol>
+      <li>「<b>ファイルを選択</b>」でリサーチのスクショを選ぶ</li>
+      <li>「<b>📷 投稿用画像を作る</b>」→ スクショの下に点数が付いた画像ができます</li>
+      <li>「<b>📤 保存・共有する</b>」→ 出てきたアプリの中から「<b>X</b>」を選ぶ</li>
+      <li>X の投稿欄に、画像と投稿文（#ゴーストマスターズ・点数・ポケモン）が入るので、そのまま投稿</li>
+    </ol>
+    <p>投稿文が入っていなかったときは、投稿欄を長押しして「<b>ペースト</b>」を押してください（「保存・共有する」を押したときにコピーされています）。画像だけ取っておきたいときは、X の代わりに「<b>画像を保存</b>」を選ぶと写真アプリに入ります。</p>
+
+    <h3>📱 ホーム画面に追加（アプリのように使う）</h3>
+    <p><b>iPhone（Safari）</b></p>
+    <ol>
+      <li>Safari でこのページを開く（X の中で開いている場合は、先に Safari で開き直す）</li>
+      <li>画面下の <b>共有ボタン</b>（四角から上向きの矢印）を押す</li>
+      <li>メニューを下へ動かして「<b>ホーム画面に追加</b>」を押す</li>
+      <li>右上の「<b>追加</b>」を押す → ホーム画面にムウマのアイコンが出ます</li>
+    </ol>
+    <p><b>Android（Chrome）</b></p>
+    <ol>
+      <li>Chrome でこのページを開く</li>
+      <li>右上の「<b>︙</b>」を押す</li>
+      <li>「<b>ホーム画面に追加</b>」を押して「<b>追加</b>」</li>
+    </ol>
+    <p class="caution">⚠ iPhone では、ホーム画面のアイコンから開くと、<b>Safari で入れた記録が出ないことがあります</b>（記録の保存場所が別になるため）。ホーム画面に追加したら、そのあとは<b>アイコンから使う</b>のがおすすめです。追加するときに「Webアプリとして開く」が出たらオフにすると、Safari と同じ記録を使えます。</p>
+
+    <h3>⚠ 注意</h3>
+    <ul>
+      <li>記録は<b>この端末のこのブラウザの中だけ</b>に保存されます。他の端末やブラウザでは見られません</li>
+      <li>ブラウザの「履歴とWebサイトデータを消去」をすると、記録も消えます</li>
+      <li>X などのアプリの中で開くと、記録が消えることがあります。Safari（Android は Chrome）で使ってください</li>
+      <li>写真は保存されません。ページを開き直したら、もう一度選んでください</li>
+    </ul>
+  </div>
+</details>
 
 <div id="days"></div>
 
@@ -1077,7 +1143,7 @@ async function makeImage(view){
       const canShare = !!(navigator.canShare && navigator.canShare({ files:[file] }));
       view.shareBtn.hidden = !canShare;
       view.resultNote.textContent = canShare
-        ? "「保存・共有する」→「画像を保存」で写真アプリに保存できます。画像の長押しでも保存できます。"
+        ? "「保存・共有する」→「X」で、画像と投稿文が X の投稿欄に入ります（投稿文が入らなかったときは、コピー済みなので貼り付けてください）。「画像を保存」で写真アプリにも保存できます。"
         : "画像を長押し（パソコンは右クリック）して保存してください。";
 
       view.resultBox.hidden = false;
@@ -1090,10 +1156,18 @@ async function makeImage(view){
    （Safariはタップ直後でないと共有メニューを開かせてくれないため） */
 function shareImage(view){
   if(!view.result) return;
-  navigator.share({ files:[view.result.file] }).catch(e=>{
+  // 投稿文もいっしょに渡す（X を選ぶと投稿欄に入る。ただし X アプリ側の都合で入らないこともある）
+  const text = buildPostText(view);
+  const data = { files:[view.result.file], text };
+  const withText = navigator.canShare && navigator.canShare(data);
+  navigator.share(withText ? data : { files:[view.result.file] }).catch(e=>{
     if(e && e.name === "AbortError") return;   // 共有メニューを閉じただけ
     alert("共有できませんでした。画像を長押しして保存してください。");
   });
+  // 投稿文が入らなかったときのために、クリップボードにもコピーしておく（入らなければ貼り付けるだけ）
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).catch(()=>{});
+  }
 }
 
 function clearResult(view){
