@@ -156,6 +156,16 @@ button{font-size:.95em;padding:7px 12px;border:1px solid var(--line);
 button:disabled{opacity:.45;cursor:not-allowed}
 .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
 
+/* スコアの提出（名前の欄と、各リサーチの提出ボタン） */
+.player{margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.player label{display:block;font-size:.9em;font-weight:bold;color:var(--accent);margin-bottom:4px}
+.player input{width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;font-size:1em}
+.player.missing{border-color:var(--minus);background:#fdecea}
+.submit-row{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.submit-row .submit{width:100%;padding:10px;border:none;border-radius:8px;
+  background:#c43d74;color:#fff;font-weight:bold;font-size:1em}
+.submit-row .note{font-size:.8em;color:var(--sub);margin-top:4px}
+
 /* 内訳 */
 .detail{font-size:.85em;color:var(--sub);margin-top:8px;
   background:#f7f7f7;border-radius:6px;padding:8px;white-space:pre-wrap}
@@ -368,6 +378,12 @@ details.guide[open]>summary::before{content:"▼"}
   </div>
 </div>
 
+<!-- スコアの提出に使う名前（1回入れれば覚えておく） -->
+<div class="player">
+  <label for="playerName">👤 あなたの X のID（スコアの提出に使います）</label>
+  <input id="playerName" placeholder="@ghost_master" autocomplete="off" autocapitalize="off" spellcheck="false">
+</div>
+
 <!-- 使い方（ふだんは閉じておき、タップで開く） -->
 <details class="guide">
   <summary>📖 使い方・ホーム画面に追加</summary>
@@ -393,6 +409,15 @@ details.guide[open]>summary::before{content:"▼"}
       <li>X の投稿欄に、画像と投稿文（#ゴーストマスターズ・点数・ポケモン）が入るので、そのまま投稿</li>
     </ol>
     <p>投稿文が入っていなかったときは、投稿欄を長押しして「<b>ペースト</b>」を押してください（「保存・共有する」を押したときにコピーされています）。画像だけ取っておきたいときは、X の代わりに「<b>画像を保存</b>」を選ぶと写真アプリに入ります。</p>
+
+    <h3>🏆 スコアを提出する（X に投稿したあと）</h3>
+    <ol>
+      <li>いちばん上の「<b>👤 あなたの X のID</b>」に、自分のID（@から始まる名前）を入れる。<b>最初の1回だけ</b>でOKです</li>
+      <li>X で、さっきの<b>自分の投稿のリンクをコピー</b>する（投稿の下の共有ボタン →「<b>リンクをコピー</b>」）</li>
+      <li>このページに戻って、そのリサーチの「<b>🏆 スコアを提出</b>」を押す → 提出フォームが開きます。名前・DAY・点数・ポケモンは<b>入力済み</b>です</li>
+      <li>フォームの「<b>X の投稿のURL</b>」の欄を長押しして「<b>ペースト</b>」→「<b>送信</b>」</li>
+    </ol>
+    <p>リサーチごとに提出してください。いちばん高い点数は、主催者の表で自動で出ます。まちがえて出したときは、正しい内容でもう一度提出すれば大丈夫です。</p>
 
     <h3>📱 ホーム画面に追加（アプリのように使う）</h3>
     <p><b>iPhone（Safari）</b></p>
@@ -463,7 +488,8 @@ details.guide[open]>summary::before{content:"▼"}
 <p class="hint">
 シルフスコープを使うと、👻 が付いたポケモンのうち一番点の高い1体が2倍になります。<br>
 記録はこの端末のブラウザ内にのみ保存されます。他の端末では見られません。<br>
-写真は保存されないため、ページを開き直すと消えます（投稿用画像を作るときだけ使います）。
+写真は保存されないため、ページを開き直すと消えます（投稿用画像を作るときだけ使います）。<br>
+<a href="organizer.html">📋 主催者の方へ：スコアの集計のしかた</a>
 </p>
 
 <script>
@@ -1012,6 +1038,17 @@ function buildSlot(dayData, slotIndex){
   resultNote.className = "note";
   resultBox.append(resultImg, resultRow, resultNote);
 
+  // スコアの提出（主催者の Googleフォームを、点数などを入れた状態で開く）
+  const submitBtn = document.createElement("button");
+  submitBtn.className = "submit";
+  submitBtn.textContent = "🏆 スコアを提出";
+  const submitNote = document.createElement("div");
+  submitNote.className = "note";
+  submitNote.textContent = "X に投稿したあとに押してください。フォームには投稿のURLを貼ってから送信します。";
+  const submitRow = document.createElement("div");
+  submitRow.className = "submit-row";
+  submitRow.append(submitBtn, submitNote);
+
   const view = {
     slot, day: dayData.day, index: slotIndex,
     scoreEl, detailEl, scopeInput, scopeNote, addBtn, countEl, monsEl,
@@ -1024,7 +1061,7 @@ function buildSlot(dayData, slotIndex){
   const palette = buildPalette(slot, view);
 
   wrap.append(head, labelInput, monsEl, addRow, palette, scopeBox, detailEl,
-              photoRow, pasteZone, photoEl, postRow, postText, resultBox);
+              photoRow, pasteZone, photoEl, postRow, postText, resultBox, submitRow);
 
   // 既存データの行を並べる
   slot.mons.forEach(m => buildMonRow(slot, m, view));
@@ -1076,6 +1113,7 @@ function buildSlot(dayData, slotIndex){
   imgBtn.onclick = ()=> makeImage(view);
   shareBtn.onclick = ()=> shareImage(view);
   txtBtn.onclick = ()=> copyPostText(view);
+  submitBtn.onclick = ()=> submitScore(view);
 
   return wrap;
 }
@@ -1210,6 +1248,83 @@ function buildPostText(view){
   if(names.length) lines.push(names.join(" / "));
   if(view.slot.scope) lines.push("🔍シルフスコープ使用");
   return lines.join("\n");
+}
+
+/* ============================================================
+   スコアの提出（主催者の Googleフォーム）
+   主催者がフォームを作ったら、ここにフォームのURLと、各質問の番号（entry.〜）を入れる。
+   空のままだと、ボタンを押したときに「まだ設定されていません」と出る。
+   番号の調べ方は organizer.html の「④」を参照
+   ============================================================ */
+const SUBMIT_FORM = {
+  url: "",            // 例: "https://docs.google.com/forms/d/e/XXXXXXXX/viewform"
+  entries: {
+    name:  "",        // X のID            例: "entry.1234567890"
+    day:   "",        // DAY
+    slot:  "",        // リサーチ（①②）
+    score: "",        // 点数
+    mons:  "",        // 出たポケモン
+    scope: "",        // シルフスコープ
+    post:  ""         // X の投稿のURL（参加者がフォームで貼る。空のままでよい）
+  }
+};
+const PLAYER_KEY = "ghostmasters_player";
+
+/* 提出に使う名前（X のID）。この端末に覚えておく */
+const playerInput = document.getElementById("playerName");
+try{ playerInput.value = localStorage.getItem(PLAYER_KEY) || ""; }catch(e){}
+playerInput.oninput = ()=>{
+  playerInput.closest(".player").classList.remove("missing");
+  try{ localStorage.setItem(PLAYER_KEY, playerInput.value.trim()); }catch(e){}
+};
+
+/* 点数などを入れた状態の Googleフォームのリンクを作る（Googleフォームの「事前入力」のしくみ） */
+const SUBMIT_LABELS = { name:"X のID", day:"DAY", slot:"リサーチ", score:"点数", mons:"出たポケモン", scope:"シルフスコープ" };
+/* X のIDの書き方をそろえる（@あり・なし、大文字・小文字、空白のちがいで、
+   主催者の表で同じ人が別の人として数えられないようにする） */
+function normalizeId(s){
+  const id = s.replace(/\s/g, "").replace(/^[@＠]+/, "").toLowerCase();
+  return id ? "@" + id : "";
+}
+function submitValues(view){
+  return {
+    name:  normalizeId(playerInput.value),
+    day:   "DAY" + view.day,
+    slot:  SLOT_MARK[view.index],
+    score: String(view.total),
+    mons:  view.slot.mons.filter(m => m.name).map(m => m.name + (m.shiny ? "★" : "")).join(" / "),
+    scope: view.slot.scope ? "使用" : "なし"
+  };
+}
+function buildSubmitUrl(view){
+  const e = SUBMIT_FORM.entries;
+  const values = submitValues(view);
+  const p = new URLSearchParams({ usp:"pp_url" });
+  Object.keys(values).forEach(k => { if(e[k]) p.append(e[k], values[k]); });
+  return SUBMIT_FORM.url + "?" + p.toString();
+}
+
+function submitScore(view){
+  if(!view.slot.mons.some(m => m.name)){
+    alert("このリサーチには、まだポケモンが入っていません。ポケモンを入れてから提出してください。");
+    return;
+  }
+  if(!playerInput.value.trim()){
+    alert("いちばん上の「👤 あなたの X のID」に、自分のIDを入れてから提出してください。");
+    const box = playerInput.closest(".player");
+    box.classList.add("missing");
+    box.scrollIntoView({ behavior:"smooth", block:"center" });
+    playerInput.focus();
+    return;
+  }
+  if(!SUBMIT_FORM.url){
+    const v = submitValues(view);
+    alert("提出先（主催者の Googleフォーム）がまだ設定されていません。\n主催者がフォームを作ると、このボタンから提出できるようになります。\n\n【この内容で提出されます】\n"
+      + Object.keys(SUBMIT_LABELS).map(k => SUBMIT_LABELS[k] + "：" + v[k]).join("\n"));
+    return;
+  }
+  // 新しいタブでフォームを開く（このページの記録はそのまま残る）
+  window.open(buildSubmitUrl(view), "_blank", "noopener");
 }
 
 function copyPostText(view){

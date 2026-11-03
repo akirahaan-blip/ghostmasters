@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>スコア集計のしかた</title>
+<link rel="icon" href="misdreavus.png">
+<style>
+:root{
+  --line:#dcdcdc;
+  --bg:#fff;
+  --fg:#222;
+  --sub:#666;
+  --accent:#4a2c6b;
+  --pink:#c43d74;
+}
+*{box-sizing:border-box}
+body{
+  font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
+  max-width:720px;margin:0 auto;padding:0 16px 60px;
+  color:var(--fg);background:var(--bg);line-height:1.75;
+}
+header{margin:0 -16px 16px;padding:20px 16px 16px;color:#fff;
+  background:linear-gradient(180deg,#140a24 0%,#2c1748 55%,#4a2c6b 100%)}
+header h1{margin:0;font-size:1.35em}
+header p{margin:4px 0 0;font-size:.9em;color:#cdb6ea}
+h2{font-size:1.1em;color:var(--accent);margin:28px 0 8px;padding-bottom:4px;border-bottom:2px solid #e4d6f2}
+ol,ul{padding-left:1.4em}
+li{margin:4px 0}
+b{color:var(--accent)}
+.flow{padding:12px;border-radius:10px;background:#f6f0fb;font-size:.95em}
+.flow div{margin:2px 0}
+table{width:100%;border-collapse:collapse;font-size:.92em;margin:8px 0}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:#f6f0fb}
+.code{position:relative;margin:8px 0}
+.code pre{margin:0;padding:10px;border-radius:8px;background:#1e1530;color:#f6e3ff;
+  font-size:.82em;white-space:pre-wrap;word-break:break-all}
+.code button{margin-top:6px;padding:7px 12px;border:none;border-radius:6px;background:var(--pink);color:#fff;font-weight:bold;font-size:.9em}
+.ok{padding:10px 12px;border-radius:8px;background:#e8f5ee;border:1px solid #b9dfc9;font-size:.92em}
+.caution{padding:10px 12px;border-radius:8px;background:#fff8e1;border:1px solid #e0a800;font-size:.92em}
+a{color:var(--pink)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 スコア集計のしかた（主催者の方へ）</h1>
+  <p>ゴーストマスターズ スコア記録ツール ／ Googleフォームで提出を受け付けて、自動で順位を出します</p>
+</header>
+
+<h2>しくみ</h2>
+<div class="flow">
+  <div>① 参加者が、スコア記録ツールでリサーチの点数を計算する</div>
+  <div>② 参加者が、X に投稿する（今までどおり）</div>
+  <div>③ 参加者が、ツールの「🏆 スコアを提出」を押す → <b>点数などが入力済みの Googleフォーム</b>が開く → 投稿のURLを貼って送信</div>
+  <div>④ 回答が <b>Googleスプレッドシートに自動でたまる</b></div>
+  <div>⑤ 主催者は、表で <b>1人ずつの最高点と順位</b>を見る。上位の人だけ、投稿のURLからスクショを確かめる</div>
+</div>
+<p>お金はかかりません。用意するのは Googleアカウントだけです。参加者は Googleアカウントがなくても提出できます。</p>
+
+<h2>① Googleフォームを作る</h2>
+<ol>
+  <li>パソコンのブラウザで <a href="https://forms.google.com/" target="_blank" rel="noopener">forms.google.com</a> を開いて、Googleアカウントでログインする</li>
+  <li>「<b>空白のフォーム</b>」（大きな「＋」）を押す</li>
+  <li>いちばん上の「無題のフォーム」を押して、「<b>ゴーストマスターズ スコア提出</b>」のように書きかえる</li>
+</ol>
+
+<h2>② 質問を7つ作る</h2>
+<p>次の表の<b>上から順番に</b>作ってください。どれも種類は「<b>記述式</b>」です（質問の右にある種類の欄で選びます）。右下の「<b>必須</b>」はオンにしてください。</p>
+<table>
+  <tr><th>順番</th><th>質問の名前</th><th>メモ</th></tr>
+  <tr><td>1</td><td>X のID</td><td></td></tr>
+  <tr><td>2</td><td>DAY</td><td></td></tr>
+  <tr><td>3</td><td>リサーチ</td><td>①か②が入ります</td></tr>
+  <tr><td>4</td><td>点数</td><td>質問の右下の「︙」→「<b>回答の検証</b>」→「<b>数値</b>」を選ぶ（順位を正しく並べるため）</td></tr>
+  <tr><td>5</td><td>出たポケモン</td><td></td></tr>
+  <tr><td>6</td><td>シルフスコープ</td><td>「使用」か「なし」が入ります</td></tr>
+  <tr><td>7</td><td>X の投稿のURL</td><td>参加者が自分で貼ります</td></tr>
+</table>
+<p>質問を足すときは、右側に出ている「<b>⊕</b>（質問を追加）」を押します。</p>
+
+<h2>③ 設定を確かめる</h2>
+<ol>
+  <li>画面の上の「<b>設定</b>」タブを押す</li>
+  <li>「<b>回答</b>」の項目を開く</li>
+  <li>「<b>メールアドレスを収集する</b>」が「収集しない」になっているか確かめる</li>
+  <li>「<b>回答を1回に制限する</b>」が<b>オフ</b>になっているか確かめる（オンだと、参加者に Googleのログインが必要になり、リサーチごとに出せなくなります）</li>
+</ol>
+
+<h2>④ 「事前入力したURL」をツールの作者に送る</h2>
+<p>ツールの「🏆 スコアを提出」ボタンとフォームをつなぐために、フォームの<b>質問の番号</b>が必要です。次の手順で作ったリンクを、ツールの作者に送ってください。</p>
+<ol>
+  <li>フォームの編集画面の右上の「<b>︙</b>」を押す</li>
+  <li>「<b>事前入力した URL を取得</b>」を押す → 回答の見本を入れる画面が開きます</li>
+  <li>質問1〜6に、<b>質問の順番の数字</b>を入れる（X のID に「1」、DAY に「2」…、シルフスコープに「6」）。質問7は空のままで大丈夫です</li>
+  <li>いちばん下の「<b>リンクを取得</b>」→「<b>リンクをコピー</b>」を押す</li>
+  <li>コピーしたリンクを、ツールの作者に送る（X のDM など）</li>
+</ol>
+<div class="ok">作者がこのリンクをツールに入れると、参加者の「🏆 スコアを提出」ボタンが使えるようになります。それまでは、ボタンを押すと「まだ設定されていません」と出ます。</div>
+
+<h2>⑤ 回答をスプレッドシートにためる</h2>
+<ol>
+  <li>フォームの編集画面の上の「<b>回答</b>」タブを押す</li>
+  <li>「<b>スプレッドシートにリンク</b>」（緑の表のマーク）を押す</li>
+  <li>「<b>新しいスプレッドシートを作成</b>」を選んで「<b>作成</b>」を押す → 回答がたまっていく表が開きます</li>
+</ol>
+<p>表の下の見出しが「<b>フォームの回答 1</b>」になっていることを確かめてください（下の式はこの名前を使っています）。</p>
+
+<h2>⑥ 自動で順位を出す表を作る</h2>
+<p><b>（1）1人ずつの最高点の順位</b></p>
+<ol>
+  <li>表の左下の「<b>＋</b>」を押して、新しいシートを足す</li>
+  <li>新しいシートの見出しを右クリック →「名前を変更」→「<b>ランキング</b>」</li>
+  <li>いちばん左上のマス（A1）を押して、下の式を貼り付けて Enter</li>
+</ol>
+<div class="code"><pre id="f1">=QUERY('フォームの回答 1'!B:E,"select B, max(E) where B is not null group by B order by max(E) desc label B 'XのID', max(E) '最高点'",1)</pre><button type="button" data-copy="f1">式をコピー</button></div>
+<p>→ 1人ずつの<b>いちばん高い点数</b>が、高い順に並びます。新しい提出があると、自動で並び直ります。</p>
+
+<p><b>（2）すべての提出を点数の高い順に並べる（スクショの確認用）</b></p>
+<ol>
+  <li>もう一度「<b>＋</b>」でシートを足して、名前を「<b>高い順</b>」にする</li>
+  <li>A1 に下の式を貼り付けて Enter</li>
+</ol>
+<div class="code"><pre id="f2">=SORT(FILTER('フォームの回答 1'!B2:H,'フォームの回答 1'!B2:B<>""),4,FALSE)</pre><button type="button" data-copy="f2">式をコピー</button></div>
+<p>→ 提出が点数の高い順に並び、いちばん右の列に <b>X の投稿のURL</b> が出ます。押すと投稿が開くので、上位の人のスクショを確かめられます。</p>
+
+<h2>⑦ 大会が終わったら</h2>
+<ol>
+  <li>「ランキング」シートで順位を見る</li>
+  <li>上位の人を「高い順」シートで探して、投稿のURLからスクショと点数が合っているか確かめる</li>
+  <li>フォームの「回答」タブの「<b>回答を受付中</b>」をオフにすると、提出を締め切れます</li>
+</ol>
+
+<h2>知っておくと安心なこと</h2>
+<ul>
+  <li>参加者は<b>リサーチごとに何回でも</b>提出できます。最高点は表で自動で出るので、同じ人の提出が何件あっても大丈夫です</li>
+  <li>まちがえて出した人は、正しい内容でもう一度出せば大丈夫です。ただし最高点で数えるので、<b>まちがえて高い点数を出した場合</b>は、主催者が表の「フォームの回答 1」でその行を消してください</li>
+  <li>X のIDは、ツールが「@」を付けて、空白を消して、小文字にそろえて送ります。同じ人が別の人として数えられにくくしています</li>
+  <li>点数は参加者の自己申告です。<b>上位の人だけ</b>投稿のスクショで確かめるのがおすすめです</li>
+</ul>
+<div class="caution">点数の計算は、ツールが大会のルール（色違い・種族ボーナス・シルフスコープ・カラカラ）どおりに自動で行います。ルールが変わるときは、大会の前にツールの作者に伝えてください。</div>
+
+<p style="margin-top:24px"><a href="./">← スコア記録ツールにもどる</a></p>
+
+<script>
+// 「式をコピー」ボタン
+document.querySelectorAll("[data-copy]").forEach(btn=>{
+  btn.onclick = ()=>{
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = ()=>{ btn.textContent = "✅ コピーしました"; };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, ()=>{ alert("コピーできませんでした。式を長押しして選んでコピーしてください。"); });
+    }else{
+      alert("コピーできませんでした。式を長押しして選んでコピーしてください。");
+    }
+  };
+});
+</script>
+</body>
+</html>
